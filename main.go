@@ -22,13 +22,6 @@ const (
 )
 
 func main() {
-	// a, _ := pgadapter.NewAdapter("postgresql://username:password@postgres:5432/database?sslmode=disable") // Your driver and data source.
-	// Alternatively, you can construct an adapter instance with *pg.Options:
-	// a, _ := pgadapter.NewAdapter(&pg.Options{
-	// 	Database: "casbin_example",
-	// 	User:     "postgres",
-	// 	Password: "mysecretpassword",
-	// })
 
 	var err error
 	A, err = pgadapter.NewAdapter("postgresql://postgres:mysecretpassword@localhost:5432/casbin?sslmode=disable")
@@ -72,17 +65,5 @@ func main() {
 	}
 
 	Start()
-
-	// // Check the permission.
-	// ok, err := e.Enforce("domain1", "alice", "data1", "read")
-	// if err != nil {
-	// 	log.Fatalf("err: %v", err)
-	// }
-
-	// if ok {
-	// 	log.Println("hi")
-	// } else {
-	// 	log.Println("no hi")
-	// }
 
 }
