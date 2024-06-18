@@ -14,6 +14,15 @@ func InitCasbin() error {
 		return err
 	}
 
+	// _, err = E.AddGroupingPolicy("teacher", "student") // teacher inherits all permissions of student
+	// if err != nil {
+	// 	return err
+	// }
+	// _, err = E.AddGroupingPolicy("admin", "teacher") // admin inherits all permissions of teacher
+	// if err != nil {
+	// 	return err
+	// }
+
 	// Load the policy from DB.
 	err = E.LoadPolicy()
 	if err != nil {

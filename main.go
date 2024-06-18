@@ -6,6 +6,7 @@ import (
 	"log"
 
 	pgadapter "github.com/casbin/casbin-pg-adapter"
+	"github.com/go-pg/pg/v10"
 	_ "github.com/lib/pq"
 )
 
@@ -18,16 +19,12 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "mysecretpassword"
-	dbname   = "casbin"
+	dbname   = "casbin_two"
 )
 
 func main() {
 
 	var err error
-	A, err = pgadapter.NewAdapter("postgresql://postgres:mysecretpassword@localhost:5432/casbin?sslmode=disable")
-	if err != nil {
-		log.Fatalf("err: %v", err)
-	}
 
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -37,26 +34,20 @@ func main() {
 		log.Fatalf("err: %v", err)
 	}
 
-	_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(50) UNIQUE NOT NULL,
-        role varchar(50) NOT NULL
-    );`)
+	opts, err := pg.ParseURL(fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable", user, password, host, port, dbname))
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
 
-	_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS casbin_rule (
-		id VARCHAR(100) PRIMARY KEY,
-		ptype VARCHAR(100),
-		v0 VARCHAR(100),
-		v1 VARCHAR(100),
-		v2 VARCHAR(100),
-		v3 VARCHAR(100)
-	);`)
+	db := pg.Connect(opts)
+	defer db.Close()
+
+	A, err = pgadapter.NewAdapterByDB(db, pgadapter.WithTableName("casbin_rule"))
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
+
+	initDb(DB)
 
 	// Initialize Casbin
 	err = InitCasbin()
